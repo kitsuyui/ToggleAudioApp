@@ -39,6 +39,21 @@ $ ./ToggleAudioApp.js 'YouTube' 'Nicovideo' 'SoundCloud'
 
 といった具合です。
 
+`~/.taa_rc` が設定ファイルです。 1 行につき 1 アプリケーション記入することができます。
+`#` を先頭に書いた行や空行はコメント行として無視します。
+
+```
+Google Chrome
+Netflix
+Nicovideo
+SoundCloud
+```
+
+## アプリケーション版
+
+ここからダウンロードできます。メニューバーに `T` のアイコンで立ち上がります。
+https://github.com/kitsuyui/ToggleAudioApp/releases
+
 ## 注意
 
 Google Chrome の再生状態については、 HTML5 の Audio 要素と Video 要素を使って検出しています。

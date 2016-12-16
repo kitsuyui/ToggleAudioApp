@@ -1,8 +1,24 @@
 #!/usr/bin/env osascript -l JavaScript
+const app = Application.currentApplication();
+app.includeStandardAdditions = true;
+
+const CONFIG_FILE = app.pathTo('home folder') + '/' + '.taa_rc';
 
 function run(args) {
-  const appNames = ['Google Chrome'].concat(args);
+  let fileContent = '';
+  try {
+    fileContent = app.read(CONFIG_FILE);
+  } catch (e) {}
+  const configAppNames = parseConfig(fileContent);
+  console.log(configAppNames);
+  const appNames = ['Google Chrome'].concat(args).concat(configAppNames);
   toggleAudioApp(appNames);
+}
+
+const parseConfig = (configStr) => {
+  const lines = configStr.split('\n');
+  return Array.from(lines).map((x) => x.trim())
+              .filter((x) => !x.startsWith('#') || !x);
 }
 
 const toggleAudioApp = (appNames) => {
@@ -12,7 +28,7 @@ const toggleAudioApp = (appNames) => {
     数カウント経過しても再生していない場合に、再生する。
    */
   const iTunes = Application('iTunes');
-  const delaying = 1.0; // seconds
+  const delaying = 5.0; // seconds
   const browserMoratorium = 10.0;
   let count = 0;
   while (true) {
@@ -34,13 +50,17 @@ const isAnyChromeEnginePlaying = (appNames) =>
     if (!isAppWaking(appName)) {
       return false;
     }
-    const chromeEngine = Application(appName);
-    return isChromePlaying(chromeEngine);
+    try {
+      const chromeEngine = Application(appName);
+      return isChromePlaying(chromeEngine);
+    } catch (e) {
+      return false;
+    }
   });
 
 const isAppWaking = (appName) => {
-  const se = Application('System Events')
-  return se.processes[appName].exists()
+  const se = Application('System Events');
+  return se.processes[appName].exists();
 };
 
 const isChromePlaying = (app) =>
