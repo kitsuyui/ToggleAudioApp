@@ -1,7 +1,6 @@
 #!/usr/bin/env osascript -l JavaScript
 const app = Application.currentApplication();
 app.includeStandardAdditions = true;
-
 const CONFIG_FILE = app.pathTo('home folder') + '/' + '.taa_rc';
 
 function run(args) {
@@ -27,18 +26,21 @@ const toggleAudioApp = (appNames) => {
     ウインドウの切替時などを考慮する。 (YouTube の連続再生中など)
     数カウント経過しても再生していない場合に、再生する。
    */
-  const iTunes = Application('iTunes');
-  const delaying = 5.0; // seconds
+  const delaying = 0.5; // seconds
   const browserMoratorium = 10.0;
   let count = 0;
   while (true) {
+    if (appPause || !isAppRunning('iTunes')) {
+      delay(delaying);
+      continue;
+    }
     if (isAnyChromeEnginePlaying(appNames)) {
-      iTunes.pause();
+      Application('iTunes').pause();
       count = 0.0;
     } else {
       count += delaying;
       if (count > browserMoratorium) {
-        iTunes.play();
+        Application('iTunes').play();
       }
     }
     delay(delaying);
@@ -47,7 +49,7 @@ const toggleAudioApp = (appNames) => {
 
 const isAnyChromeEnginePlaying = (appNames) =>
   appNames.some((appName) => {
-    if (!isAppWaking(appName)) {
+    if (!isAppRunning(appName)) {
       return false;
     }
     try {
@@ -58,7 +60,7 @@ const isAnyChromeEnginePlaying = (appNames) =>
     }
   });
 
-const isAppWaking = (appName) => {
+const isAppRunning = (appName) => {
   const se = Application('System Events');
   return se.processes[appName].exists();
 };
@@ -79,3 +81,5 @@ const isChromeTabPlaying = (tab) =>
       return playingElements.length > 0;
     })();
   `});
+
+var appPause = !isAppRunning('iTunes');
