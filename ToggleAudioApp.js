@@ -3,7 +3,7 @@ const app = Application.currentApplication();
 app.includeStandardAdditions = true;
 const CONFIG_FILE = app.pathTo('home folder') + '/' + '.taa_rc';
 
-function run(args) {
+this.run = (args) => {
   let fileContent = '';
   try {
     fileContent = app.read(CONFIG_FILE);
@@ -12,7 +12,7 @@ function run(args) {
   console.log(configAppNames);
   const appNames = ['Google Chrome'].concat(args).concat(configAppNames);
   toggleAudioApp(appNames);
-}
+};
 
 const parseConfig = (configStr) => {
   const lines = configStr.split('\n');
